@@ -20,6 +20,9 @@ package org.apache.nutch.protocol.interactiveselenium;
 import java.io.UnsupportedEncodingException;
 import java.lang.NumberFormatException;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -32,12 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handler for the site http://newark.com.
+ * Handler for the site http://digikey.com.
  * @author Joey Hong
  */
-public class NewarkHandler implements InteractivePhantomJSHandler {
+public class DXHandler implements InteractivePhantomJSHandler {
     public static final Logger LOG = LoggerFactory
-	.getLogger(NewarkHandler.class);
+	.getLogger(DXHandler.class);
 
     @Override
     public String processDriver(WebDriver driver) {
@@ -47,21 +50,15 @@ public class NewarkHandler implements InteractivePhantomJSHandler {
 	String content = driver.findElement(By.tagName("body")).getText();
 	buffer.append(content).append("\n");
 	
-	WebElement pages = driver.findElement(By.xpath("//span[@class='pages']"));
+	WebElement pages = driver.findElement(By.xpath("//div[@class='page_wrapper']/div[@class='paging-range']"));
 	if (pages == null) {
 	    return buffer.toString();
 	}
+
+	int lastPage = Integer.parseInt(pages.findElement(By.xpath(".//span[@class='pageCount']")).getText());
 	
-	int lastPageNum = 1;
-	try {
-	    lastPageNum = Integer.parseInt(
-			      pages.findElement(By.xpath("./span[@class='paginNext pageIt']/a")).getAttribute("data-rel"));
-	} catch (NumberFormatException e) {
-	    // do nothing
-	}
-	
-	for (int i = 2; i <= lastPageNum; i++) {
-	    buffer.append("<a href=\"").append(driver.getCurrentUrl()).append("/prl/results/").append(i)
+	for (int i = 2; i <= lastPage; i++) {
+	    buffer.append("<a href=\"").append(driver.getCurrentUrl()).append("?page=").append(i)
 		.append("\" />\n");
 	}
 	
@@ -70,7 +67,8 @@ public class NewarkHandler implements InteractivePhantomJSHandler {
     
     @Override
     public boolean shouldProcessURL(String URL) {
-	if (URL.startsWith("http://www.newark.com/") && !URL.contains("/results/")) {
+	String pattern = "http://www.dx.com/c/.+/.+";
+	if (URL.matches(pattern) && !URL.contains("page")) {
 	    return true;
 	}
 	return false;

@@ -1,2 +1,2 @@
 # Focused Crawl - Electronics
-Includes Nutch Protocol Interactive-Selenium handlers that leverage Firefox or PhantomJS to fetch focused results from Electronics URLs. The PhantomJS Ghostdriver allows headless and parallizable browsing that tested with better results than both the stanford FirefoxDriver and HtmlUnitDriver.
+Includes Nutch Protocol Interactive-Selenium handlers that leverage Firefox or PhantomJS to fetch focused results from Electronics URLs.
